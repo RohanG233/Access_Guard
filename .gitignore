@@ -1,0 +1,59 @@
+# ============================================================
+# AccessGuard — .gitignore
+# ============================================================
+
+# ── Environment (NEVER commit) ────────────────────────────
+.env
+
+# ── Python bytecode & cache ───────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# ── Package / build artifacts ─────────────────────────────
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# ── Virtual environments ──────────────────────────────────
+venv/
+.venv/
+env/
+ENV/
+
+# ── Runtime-generated directories ────────────────────────
+# These are created automatically when the app starts.
+# They contain user biometric data and must never be committed.
+data/
+plots/
+log/
+
+# ── Biometric & media files (safety net) ─────────────────
+# Catches any stray files outside data/ as well.
+*.wav
+*.jpg
+*.jpeg
+*.png
+
+# ── dlib pre-trained model files ─────────────────────────
+# Large binaries (~100 MB each) — download separately.
+# See README.md "How to Run Locally" for download instructions.
+*.dat
+
+# ── Temp / debug files ────────────────────────────────────
+startup.log
+startup_err.log
+*.log
+
+# ── OS files ──────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE / editor ──────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+*.swo

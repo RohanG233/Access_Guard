@@ -1,11 +1,63 @@
-<!-- templates/welcome.html -->
 {% extends "base.html" %}
-
-{% block title %}Welcome{% endblock %}
+{% block title %}{% if source == 'register' %}Registered — AccessGuard{% else %}Access Granted — AccessGuard{% endif %}{% endblock %}
 
 {% block content %}
-    <h1 class="mt-5">Welcome</h1>
-    <p><strong>{{ name }}</strong></p>
-    <p>Roll number : <strong>{{ rollno }}</strong>.</p>
-    <p>Your user ID is <strong>{{ user_id }}</strong>.</p>
+<div class="access-granted">
+
+    <div class="badge-granted">
+        {% if source == 'register' %}
+        <i class="fas fa-user-check"></i>&nbsp; REGISTRATION SUCCESSFUL
+        {% else %}
+        <i class="fas fa-check-circle"></i>&nbsp; ACCESS GRANTED — WELCOME, {{ name.upper() }}
+        {% endif %}
+    </div>
+
+    <div class="user-info-row">
+        <span class="info-label"><i class="fas fa-user"></i>&nbsp; Name</span>
+        <span class="info-value">{{ name }}</span>
+    </div>
+    <div class="user-info-row">
+        <span class="info-label"><i class="fas fa-hashtag"></i>&nbsp; Roll No</span>
+        <span class="info-value">{{ rollno }}</span>
+    </div>
+    <div class="user-info-row">
+        <span class="info-label"><i class="fas fa-id-badge"></i>&nbsp; User ID</span>
+        <span class="info-value">{{ user_id }}</span>
+    </div>
+    <div class="user-info-row">
+        <span class="info-label"><i class="fas fa-clock"></i>&nbsp; Time</span>
+        <span class="info-value" id="accessTime"></span>
+    </div>
+
+    {% if source == 'login' %}
+    <div class="mt-4" style="font-family:'Share Tech Mono',monospace; font-size:0.78rem; color:#2a6644;">
+        REDIRECTING IN <span id="countdown" style="color:#00ff64;">10</span> SECONDS...
+    </div>
+    <div class="countdown-bar-wrap mt-2">
+        <div class="countdown-bar" id="countdownBar"></div>
+    </div>
+    {% endif %}
+
+</div>
+
+<script>
+    document.getElementById('accessTime').textContent =
+        new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    {% if source == 'login' %}
+    let seconds = 10;
+    const counter = document.getElementById('countdown');
+    const bar     = document.getElementById('countdownBar');
+
+    const timer = setInterval(() => {
+        seconds--;
+        counter.textContent = seconds;
+        bar.style.width = (seconds / 10 * 100) + '%';
+        if (seconds <= 0) {
+            clearInterval(timer);
+            window.location.href = "{{ url_for('recognize') }}";
+        }
+    }, 1000);
+    {% endif %}
+</script>
 {% endblock %}

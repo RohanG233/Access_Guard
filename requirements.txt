@@ -1,9 +1,42 @@
-Flask==2.0.1
-pymongo==3.11.4
-pycryptodome==3.10.1
-opencv-python==4.5.3.56
-pyaudio==0.2.11
-SpeechRecognition==3.8.1
-cryptography==3.4.8
-numpy==1.21.2
-scikit-learn==0.24.2
+# Core web framework
+Flask==3.0.3
+Werkzeug==3.0.3
+
+# CSRF protection
+Flask-WTF==1.2.1
+
+# Rate limiting
+Flask-Limiter==3.7.0
+
+# Database
+pymongo==4.7.3
+
+# Cryptography / encryption
+pycryptodome==3.20.0
+cryptography==42.0.8
+bcrypt==4.1.3
+
+# Computer Vision
+opencv-python==4.10.0.84
+# dlib is installed via pre-built wheel on Windows (see README), or: pip install dlib
+# face-recognition wraps dlib with a simpler API
+face-recognition==1.3.0
+numpy==1.26.4
+
+# Audio / Voice processing
+pyaudio==0.2.14
+SpeechRecognition==3.10.4
+librosa==0.10.2
+scipy==1.13.1
+
+# Machine Learning
+scikit-learn==1.5.0
+
+# Plotting
+matplotlib==3.9.0
+
+# Environment variables
+python-dotenv==1.0.1
+
+# Production WSGI server
+gunicorn==22.0.0

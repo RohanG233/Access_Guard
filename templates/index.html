@@ -1,12 +1,28 @@
-<!-- templates/index.html -->
 {% extends "base.html" %}
-
-{% block title %}Home{% endblock %}
+{% block title %}AccessGuard — Entry System{% endblock %}
 
 {% block content %}
-    <h1 class="mt-5">Welcome</h1>
-    <div class="mt-5">
-        <a href="{{ url_for('store') }}" class="btn btn-primary">Store</a>
-        <a href="{{ url_for('recognize') }}" class="btn btn-secondary">Recognize</a>
+<div class="hero">
+    <div class="system-id">SYSTEM ID: AG-2024 &nbsp;|&nbsp; STATUS: ONLINE</div>
+    <h1><i class="fas fa-shield-alt"></i> AccessGuard</h1>
+    <div class="tagline">BIOMETRIC ENTRY CONTROL SYSTEM &nbsp;// FACE + VOICE + PIN</div>
+    <hr class="hero-divider">
+
+    <div class="hero-btn-group">
+        <a href="{{ url_for('store') }}" class="btn btn-secondary">
+            <i class="fas fa-user-plus"></i>&nbsp; New Enrollment
+        </a>
+        <a href="{{ url_for('recognize') }}" class="btn btn-primary">
+            <i class="fas fa-fingerprint"></i>&nbsp; Request Access
+        </a>
     </div>
+</div>
+
+<hr class="section-divider mt-4">
+
+<div style="font-family:'Share Tech Mono',monospace; font-size:0.75rem; color:#1a5c35; line-height:2;">
+    <div>&gt; AUTHENTICATION FACTORS: 3 (PIN + FACE + VOICE)</div>
+    <div>&gt; FACE THRESHOLD: 50% &nbsp;|&nbsp; VOICE THRESHOLD: 60%</div>
+    <div>&gt; ENCRYPTION: AES-EAX &nbsp;|&nbsp; STORAGE: MONGODB</div>
+</div>
 {% endblock %}

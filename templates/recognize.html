@@ -1,94 +1,195 @@
-<!-- templates/recognize.html -->
 {% extends "base.html" %}
-
-{% block title %}Recognize{% endblock %}
+{% block title %}Access Request — AccessGuard{% endblock %}
 
 {% block content %}
-    <h1 class="mt-5">Recognize</h1>
-    {% if error %}
-    <div class="alert alert-danger mt-3">
-        {{ error }}
+<h2><i class="fas fa-fingerprint"></i> Access Request</h2>
+
+<!-- User ID does not exist -->
+{% if error_type == 'userid' %}
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="background:#0a1f12; border:1px solid #ff4444; color:#fff;">
+            <div class="modal-header" style="border-bottom:1px solid #ff4444;">
+                <h5 class="modal-title" style="font-family:'Share Tech Mono',monospace; color:#ff4444;">
+                    <i class="fas fa-user-times"></i>&nbsp; USER NOT FOUND
+                </h5>
+            </div>
+            <div class="modal-body" style="font-family:'Share Tech Mono',monospace;">
+                <p style="font-size:1rem; color:#ff6666;">User ID <strong>does not exist</strong> in the system.</p>
+                <p style="font-size:0.85rem; color:#aaa;">Please check your 7-digit User ID and try again.</p>
+            </div>
+            <div class="modal-footer" style="border-top:1px solid #ff4444;">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
+            </div>
+        </div>
     </div>
-    {% endif %}
-    <form method="POST" id="recognizeForm">
-        <div class="form-group">
-            <label for="user_id">User ID</label>
-            <input type="text" class="form-control" id="user_id" name="user_id" required>
-        </div>
-        <div class="form-group">
-            <label for="pincode">PIN</label>
-            <input type="password" class="form-control" id="pincode" name="pincode" required>
-        </div>
-        <div class="form-group">
-            <label for="face_data">Face Data</label>
-            <div>
-                <button type="button" class="btn btn-secondary" onclick="captureFaceData()">Capture Face</button>
-                <span id="faceStatus"></span>
+</div>
+{% endif %}
+
+<!-- Wrong PIN -->
+{% if error_type == 'pin' %}
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="background:#0a1f12; border:1px solid #ff4444; color:#fff;">
+            <div class="modal-header" style="border-bottom:1px solid #ff4444;">
+                <h5 class="modal-title" style="font-family:'Share Tech Mono',monospace; color:#ff4444;">
+                    <i class="fas fa-lock"></i>&nbsp; WRONG PIN
+                </h5>
             </div>
-            <input type="hidden" id="face_data" name="face_data">
-        </div>
-        <div class="form-group">
-            <label for="voice_data">Voice Data</label>
-            <div>
-                <button type="button" class="btn btn-secondary" onclick="captureVoiceData()">Capture Voice</button>
-                <span id="voiceStatus"></span>
+            <div class="modal-body" style="font-family:'Share Tech Mono',monospace;">
+                <p style="font-size:1rem; color:#ff6666;">The PIN you entered is <strong>incorrect</strong>.</p>
+                <p style="font-size:0.85rem; color:#aaa;">Please re-enter your access PIN and try again.</p>
             </div>
-            <input type="hidden" id="voice_data" name="voice_data">
+            <div class="modal-footer" style="border-top:1px solid #ff4444;">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
+            </div>
         </div>
-        <div id="voicePreview" class="alert alert-info" style="display: none;">
-            Recording voice...
+    </div>
+</div>
+{% endif %}
+
+<!-- Biometric mismatch -->
+{% if error_type == 'biometric' %}
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="background:#0a1f12; border:1px solid #ff4444; color:#fff;">
+            <div class="modal-header" style="border-bottom:1px solid #ff4444;">
+                <h5 class="modal-title" style="font-family:'Share Tech Mono',monospace; color:#ff4444;">
+                    <i class="fas fa-ban"></i>&nbsp; BIOMETRIC MISMATCH
+                </h5>
+            </div>
+            <div class="modal-body" style="font-family:'Share Tech Mono',monospace; font-size:0.9rem;">
+                <table class="table table-sm" style="color:#ccc; border-color:#1a4a2a;">
+                    <thead>
+                        <tr style="color:#7affb2;">
+                            <th>Check</th>
+                            <th>Your Score</th>
+                            <th>Min Required</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><i class="fas fa-camera"></i> Face</td>
+                            <td>{{ face_score }}%</td>
+                            <td>{{ face_threshold }}%</td>
+                            <td>
+                                {% if face_score >= face_threshold %}
+                                <span style="color:#00ff64;">&#10003; PASS</span>
+                                {% else %}
+                                <span style="color:#ff4444;">&#10007; FAIL</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-microphone"></i> Voice</td>
+                            <td>{{ voice_score }}%</td>
+                            <td>{{ voice_threshold }}%</td>
+                            <td>
+                                {% if voice_score >= voice_threshold %}
+                                <span style="color:#00ff64;">&#10003; PASS</span>
+                                {% else %}
+                                <span style="color:#ff4444;">&#10007; FAIL</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size:0.8rem; color:#aaa; margin-top:8px;">Please re-scan your face and re-record your voice, then try again.</p>
+            </div>
+            <div class="modal-footer" style="border-top:1px solid #ff4444;">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">TRY AGAIN</button>
+            </div>
         </div>
-        <button type="submit" class="btn btn-primary" id="submitButton" disabled>Submit</button>
-    </form>
-    <script>
-        // JavaScript functions for capturing face and voice data remain the same
-        function captureFaceData() {
-            const faceDataInput = document.getElementById('face_data');
-            fetch('/capture_face_data')
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        faceDataInput.value = data.face_data;
-                        document.getElementById('faceStatus').innerHTML = '<span class="text-success">✔</span>';
-                        checkFormCompletion();
-                    } else {
-                        alert("Face capture failed");
-                    }
-                });
-        }
+    </div>
+</div>
+{% endif %}
 
-        function captureVoiceData() {
-            const voiceDataInput = document.getElementById('voice_data');
-            const voicePreview = document.getElementById('voicePreview');
-            console.log('Capturing voice data...');
-            voicePreview.style.display = 'block';
-            fetch('/capture_voice_data')
-                .then(response => response.json())
-                .then(data => {
-                    voicePreview.style.display = 'none';
-                    if (data.success) {
-                        voiceDataInput.value = data.voice_data;
-                        document.getElementById('voiceStatus').innerHTML = '<span class="text-success">✔</span>';
-                        checkFormCompletion();
-                    } else {
-                        alert("Voice capture failed");
-                    }
-                });
-        }
+<!-- Generic error (rate limit, CSRF, etc.) -->
+{% if error and not error_type %}
+<div class="modal fade" id="errorModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content" style="background:#0a1f12; border:1px solid #ff4444; color:#fff;">
+            <div class="modal-header" style="border-bottom:1px solid #ff4444;">
+                <h5 class="modal-title" style="font-family:'Share Tech Mono',monospace; color:#ff4444;">
+                    <i class="fas fa-exclamation-triangle"></i>&nbsp; ERROR
+                </h5>
+            </div>
+            <div class="modal-body" style="font-family:'Share Tech Mono',monospace;">
+                {{ error }}
+            </div>
+            <div class="modal-footer" style="border-top:1px solid #ff4444;">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">OK</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 
-        function checkFormCompletion() {
-            const faceData = document.getElementById('face_data').value;
-            const voiceData = document.getElementById('voice_data').value;
-            const submitButton = document.getElementById('submitButton');
-            if (faceData && voiceData) {
-                submitButton.disabled = false;
-            } else {
-                submitButton.disabled = true;
-            }
-        }
-    
+{% if error_type or error %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        $('#errorModal').modal('show');
+    });
+</script>
+{% endif %}
 
-    </script>
+<form method="POST" id="recognizeForm">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="user_id"><i class="fas fa-id-badge"></i> User ID</label>
+                <input type="text" class="form-control" id="user_id" name="user_id"
+                       placeholder="7-digit ID"
+                       pattern="\d{7}" minlength="7" maxlength="7" required>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="pincode"><i class="fas fa-lock"></i> Access PIN</label>
+                <input type="password" class="form-control" id="pincode" name="pincode"
+                       placeholder="Enter PIN"
+                       pattern="\d{4,12}" minlength="4" maxlength="12" required>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Face capture -->
+    <div class="form-group">
+        <label><i class="fas fa-camera"></i> Face Verification</label>
+        <div class="capture-row">
+            <button type="button" class="btn btn-secondary" onclick="captureFaceData()">
+                <i class="fas fa-camera"></i>&nbsp; Scan Face
+            </button>
+            <span id="faceStatus"></span>
+        </div>
+        <input type="hidden" id="face_data" name="face_data">
+    </div>
+
+    <!-- Voice capture -->
+    <div class="form-group">
+        <label><i class="fas fa-microphone"></i> Voice Verification</label>
+        <div class="capture-row">
+            <button type="button" class="btn btn-secondary" onclick="captureVoiceData()">
+                <i class="fas fa-microphone"></i>&nbsp; Record Voice
+            </button>
+            <span id="voiceStatus"></span>
+        </div>
+        <input type="hidden" id="voice_data" name="voice_data">
+    </div>
+
+    <div id="voicePreview" style="display:none;" class="alert">
+        <i class="fas fa-circle"></i>&nbsp; REC — SPEAK NOW...
+    </div>
+
+    <hr class="section-divider">
+
+    <button type="submit" class="btn btn-primary btn-block" id="submitButton" disabled>
+        <i class="fas fa-unlock-alt"></i>&nbsp; Request Entry
+    </button>
+</form>
 {% endblock %}
-
-        
